@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keyboard Typing Simulator Online</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            margin: 1rem;
+        }
+
+        .title {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #startBtn {
+            background: #1a73e8;
+            color: white;
+        }
+
+        #startBtn:hover {
+            background: #1557b0;
+        }
+
+        #stopBtn {
+            background: #dc3545;
+            color: white;
+        }
+
+        #stopBtn:hover {
+            background: #bb2d3b;
+        }
+
+        .slider-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-value {
+            background: #e9ecef;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            -webkit-appearance: none;
+            background: #dee2e6;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #1a73e8;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #1557b0;
+            transform: scale(1.1);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+                width: 95%;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .slider-container {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Keyboard Typing Simulator</h1>
+        <div class="controls">
+            <div class="button-group">
+                <button id="startBtn">Start Typing</button>
+                <button id="stopBtn">Stop</button>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <label>Minimum Interval</label>
+                    <span class="slider-value" id="minSpeedValue">100ms</span>
+                </div>
+                <input type="range" id="minSpeed" min="50" max="500" value="100">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <label>Maximum Interval</label>
+                    <span class="slider-value" id="maxSpeedValue">300ms</span>
+                </div>
+                <input type="range" id="maxSpeed" min="100" max="1000" value="300">
+            </div>
+        </div>
+        <div class="status" id="status">Current Status: Stopped</div>
+    </div>
+
+    <script>
+        const keyboardSounds = [
+            'typing-sound-01.mp3',
+            'typing-sound-02.mp3',
+            'typing-sound-03.mp3',
+            'typing-sound-04.mp3',
+        ];
+        
+        let isPlaying = false;
+        let timeoutId = null;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const minSpeed = document.getElementById('minSpeed');
+        const maxSpeed = document.getElementById('maxSpeed');
+        const minSpeedValue = document.getElementById('minSpeedValue');
+        const maxSpeedValue = document.getElementById('maxSpeedValue');
+        const status = document.getElementById('status');
+
+        function playRandomSound() {
+            if (!isPlaying) return;
+            
+            const soundIndex = Math.floor(Math.random() * keyboardSounds.length);
+            const audio = new Audio(keyboardSounds[soundIndex]);
+            
+            audio.play();
+            
+            const delay = Math.random() * (maxSpeed.value - minSpeed.value) + parseInt(minSpeed.value);
+            timeoutId = setTimeout(playRandomSound, delay);
+        }
+
+        startBtn.addEventListener('click', () => {
+            isPlaying = true;
+            playRandomSound();
+            status.textContent = 'Current Status: Typing';
+            startBtn.style.opacity = '0.7';
+            stopBtn.style.opacity = '1';
+        });
+
+        stopBtn.addEventListener('click', () => {
+            isPlaying = false;
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            status.textContent = 'Current Status: Stopped';
+            startBtn.style.opacity = '1';
+            stopBtn.style.opacity = '0.7';
+        });
+
+        minSpeed.addEventListener('input', () => {
+            minSpeedValue.textContent = `${minSpeed.value}ms`;
+        });
+
+        maxSpeed.addEventListener('input', () => {
+            maxSpeedValue.textContent = `${maxSpeed.value}ms`;
+        });
+    </script>
+</body>
+</html> 
