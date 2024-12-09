@@ -40,6 +40,12 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
+.grid-item a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 /* 图片容器 */
 .image-container {
     position: relative;
